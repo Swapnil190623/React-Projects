@@ -8,25 +8,24 @@ function ViewOrders() {
   const [booksWithOrders, setBooksWithOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(true); // Track loading state
   const [error, setError] = useState(null); // Track any errors
-
   useEffect(() => {
     const fetchOrders = async () => {
       setIsLoading(true);
-      setError(null); // Reset error on each fetch
+      setError(null);
 
       try {
-        // Fetch user's books and their orders
         const books = await firebase.fetchMyBooks(firebase.user.uid);
-        const booksWithActiveOrders = [];
+        const booksWithOrders = [];
         for (const book of books.docs) {
           const orders = await firebase.getOrders(book.id);
           if (orders.docs.length > 0) {
-            booksWithActiveOrders.push({ ...book.data(), orders: orders.docs });
+            const purchasedBook = { ...book.data(), orders: orders.docs };
+            booksWithOrders.push(purchasedBook);
           }
         }
-        setBooksWithOrders(booksWithActiveOrders);
+        setBooksWithOrders(booksWithOrders);
       } catch (err) {
-        setError(err.message); // Handle errors gracefully
+        setError(err.message);
       } finally {
         setIsLoading(false);
       }
@@ -69,7 +68,12 @@ function ViewOrders() {
             {booksWithOrders.map((bookData) => (
               // Assuming first order
 
-              <BookCard className="block"  id={bookData.id} key={bookData.id} {...bookData} />
+              <BookCard
+                className="block"
+                id={bookData.id}
+                key={bookData.id}
+                {...bookData}
+              />
             ))}
           </div>
         </>

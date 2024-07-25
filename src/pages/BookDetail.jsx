@@ -7,9 +7,8 @@ import Form from "react-bootstrap/Form";
 import { Navigate } from "react-router-dom";
 
 function BookDetail() {
-
-  const navigate = useNavigate()
-  const handleBuyBook = () => {
+  const navigate = useNavigate();
+  const handleBuyBook = async () => {
     if (!firebase.isLoggedIn) {
       navigate("/login", {
         state: { message: "Please log in to purchase a book." },
@@ -17,8 +16,15 @@ function BookDetail() {
       return;
     }
 
-    // Handle purchase logic here
-    console.log("Purchase book with ID:", bookId);
+    try {
+      const result = await firebase.placeOrder(params.bookId, qty);
+      console.log("Order Is Placed ...", result);
+      alert("Your Order Is Placed ");
+      navigate("/book/orders"); // Redirect to orders page
+    } catch (error) {
+      console.error("Error placing order:", error);
+      alert("Failed to place order. Please try again.");
+    }
   };
   const params = useParams();
   const firebase = useFirebase();
@@ -71,7 +77,7 @@ function BookDetail() {
         className="p-3 rounded-2xl mt-2 shadow-lg text-xl"
         onClick={handleBuyBook}
         variant="dark"
-         // Disable button if not logged in
+        // Disable button if not logged in
       >
         {firebase.isLoggedIn ? "Buy Now" : "Login to Buy"}
       </Button>
