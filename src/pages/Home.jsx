@@ -2,7 +2,7 @@ import React from "react";
 import { useEffect, useState } from "react";
 import { useFirebase } from "../context/Firebase";
 import BookCard from "../components/Card";
-import CardGroup from "react-bootstrap/CardGroup";
+import { Row, Col } from "react-bootstrap";
 
 function Home() {
   const firebase = useFirebase();
@@ -12,8 +12,7 @@ function Home() {
     firebase.listAllBooks().then((books) => setBooks(books.docs));
   }, []);
 
-
-  //cheking the user auth before buying the book ..
+  // Checking the user auth before buying the book
   const handleBuyBook = (bookId) => {
     // Check if user is logged in
     if (!firebase.isLoggedIn) {
@@ -26,23 +25,20 @@ function Home() {
     console.log(`User is logged in, handle book purchase: ${bookId}`); // Placeholder for actual purchase
   };
 
-
   return (
-    <div className="container mt-4 ">
-      <CardGroup className="">
+    <div className="container mt-4">
+      <Row xs={1} md={2} lg={4} className="g-4"> {/* Grid configuration for 4 cards per row */}
         {books.map((book) => (
-          <BookCard
-
-          
-            link={`/book/view/${book.id}`}
-            key={book.id}
-            id={book.id}
-            {...book.data()}
-            onBuy={() => handleBuyBook(book.id)}
-            
-          />
+          <Col key={book.id}>
+            <BookCard
+              link={`/book/view/${book.id}`}
+              id={book.id}
+              {...book.data()}
+              onBuy={() => handleBuyBook(book.id)}
+            />
+          </Col>
         ))}
-      </CardGroup>
+      </Row>
     </div>
   );
 }
